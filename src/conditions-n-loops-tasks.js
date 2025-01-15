@@ -340,8 +340,45 @@ function getBalanceIndex(arr) {
  *          [10, 9,  8,  7]
  *        ]
  */
-function getSpiralMatrix(/* size */) {
-  throw new Error('Not implemented');
+function getSpiralMatrix(size) {
+  const matrix = [];
+  for (let i = 0; i < size; i += 1) {
+    matrix[i] = [];
+  }
+
+  let value = 1;
+  let rowStart = 0;
+  let rowEnd = size - 1;
+  let colStart = 0;
+  let colEnd = size - 1;
+
+  while (value <= size * size) {
+    for (let i = colStart; i <= colEnd; i += 1) {
+      matrix[rowStart][i] = value;
+      value += 1;
+    }
+    rowStart += 1;
+
+    for (let i = rowStart; i <= rowEnd; i += 1) {
+      matrix[i][colEnd] = value;
+      value += 1;
+    }
+    colEnd -= 1;
+
+    for (let i = colEnd; i >= colStart; i -= 1) {
+      matrix[rowEnd][i] = value;
+      value += 1;
+    }
+    rowEnd -= 1;
+
+    for (let i = rowEnd; i >= rowStart; i -= 1) {
+      matrix[i][colStart] = value;
+      value += 1;
+    }
+    colStart += 1;
+  }
+
+  return matrix;
 }
 
 /**
@@ -359,8 +396,33 @@ function getSpiralMatrix(/* size */) {
  *    [7, 8, 9]         [9, 6, 3]
  *  ]                 ]
  */
-function rotateMatrix(/* matrix */) {
-  throw new Error('Not implemented');
+function rotateMatrix(matrix) {
+  const copy = matrix;
+  const n = matrix.length;
+
+  for (let i = 0; i < n; i += 1) {
+    for (let j = i + 1; j < n; j += 1) {
+      const temp = matrix[i][j];
+      copy[i][j] = matrix[j][i];
+      copy[j][i] = temp;
+    }
+  }
+
+  for (let i = 0; i < n; i += 1) {
+    let start = 0;
+    let end = n - 1;
+
+    while (start < end) {
+      const temp = matrix[i][start];
+      copy[i][start] = matrix[i][end];
+      copy[i][end] = temp;
+
+      start += 1;
+      end -= 1;
+    }
+  }
+
+  return matrix;
 }
 
 /**
@@ -377,8 +439,40 @@ function rotateMatrix(/* matrix */) {
  *  [2, 9, 5, 9]    => [2, 5, 9, 9]
  *  [-2, 9, 5, -3]  => [-3, -2, 5, 9]
  */
-function sortByAsc(/* arr */) {
-  throw new Error('Not implemented');
+function sortByAsc(arr) {
+  function swap(array, i, j) {
+    const copy = array;
+    const temp = array[i];
+    copy[i] = array[j];
+    copy[j] = temp;
+  }
+
+  function partition(array, low, high) {
+    const pivot = array[high];
+    let i = low - 1;
+
+    for (let j = low; j < high; j += 1) {
+      if (array[j] <= pivot) {
+        i += 1;
+        swap(array, i, j);
+      }
+    }
+    swap(array, i + 1, high);
+    return i + 1;
+  }
+
+  function quickSort(array, low, high) {
+    if (low < high) {
+      const pi = partition(array, low, high);
+
+      quickSort(array, low, pi - 1);
+      quickSort(array, pi + 1, high);
+    }
+  }
+
+  quickSort(arr, 0, arr.length - 1);
+
+  return arr;
 }
 
 /**
@@ -398,8 +492,27 @@ function sortByAsc(/* arr */) {
  *  '012345', 3 => '024135' => '043215' => '031425'
  *  'qwerty', 3 => 'qetwry' => 'qtrewy' => 'qrwtey'
  */
-function shuffleChar(/* str, iterations */) {
-  throw new Error('Not implemented');
+function shuffleChar(str, iterations) {
+  let result = str;
+  const { length } = result;
+  let evenChars;
+  let oddChars;
+
+  for (let i = 0; i < iterations; i += 1) {
+    evenChars = '';
+    oddChars = '';
+
+    for (let j = 0; j < length; j += 2) {
+      evenChars += result[j];
+      if (j + 1 < length) {
+        oddChars += result[j + 1];
+      }
+    }
+
+    result = evenChars + oddChars;
+  }
+
+  return result;
 }
 
 /**
@@ -419,8 +532,61 @@ function shuffleChar(/* str, iterations */) {
  * @param {number} number The source number
  * @returns {number} The nearest larger number, or original number if none exists.
  */
-function getNearestBigger(/* number */) {
-  throw new Error('Not implemented');
+function getNearestBigger(number) {
+  const digits = {};
+  let length = 0;
+  let num = number;
+
+  while (num > 0) {
+    digits[length] = num % 10;
+    num = Math.floor(num / 10);
+    length += 1;
+  }
+
+  let left = 0;
+  let right = length - 1;
+  while (left < right) {
+    const temp = digits[left];
+    digits[left] = digits[right];
+    digits[right] = temp;
+    left += 1;
+    right -= 1;
+  }
+
+  let i = length - 2;
+  while (i >= 0 && digits[i] >= digits[i + 1]) {
+    i -= 1;
+  }
+
+  if (i === -1) {
+    return number;
+  }
+
+  let j = length - 1;
+  while (j > i && digits[j] <= digits[i]) {
+    j -= 1;
+  }
+
+  let temp = digits[i];
+  digits[i] = digits[j];
+  digits[j] = temp;
+
+  left = i + 1;
+  right = length - 1;
+  while (left < right) {
+    temp = digits[left];
+    digits[left] = digits[right];
+    digits[right] = temp;
+    left += 1;
+    right -= 1;
+  }
+
+  let result = 0;
+  for (let k = 0; k < length; k += 1) {
+    result = result * 10 + digits[k];
+  }
+
+  return result;
 }
 
 module.exports = {
